@@ -7,30 +7,14 @@ function getComputerChoice() {
     else return "scissors";
 }
 
-function getPlayerChoice() {
-    let invalidInput = true;
-    let playerChoice;
-
-    do {
-        playerChoice = prompt("Type in Rock, Paper, or Scissors!");
-        playerChoice = playerChoice.toLowerCase();
-
-        if (playerChoice == "rock" ||
-            playerChoice == "paper" ||
-            playerChoice == "scissors"
-        ) {
-            invalidInput = false;
-        } else {
-            alert("Invalid response. Please try again.");
-        }
-    } while (invalidInput);
-
-    return playerChoice;
-}
-
-function playRound(playerSelection, computerSelection) {
+function playRound(playerSelection, computerSelection, images) {
     console.log("Player choice : " + playerSelection);
     console.log("Computer choice : " + computerSelection);
+
+    //display image
+    images.innerHTML = `<img src="./images/${playerSelection}.png">
+                    <img src="./images/${computerSelection}-inverted.png">`
+
     if (playerSelection == computerSelection) {
         return TIE;
     }
@@ -56,31 +40,36 @@ function playRound(playerSelection, computerSelection) {
     }
 }
 
-function game() {
-    let numPlayerWin = 0;
-    let numCompWin = 0;
+function gameHandler(choice) {
+    const images = document.querySelector('.images');
+    const playerScore = document.querySelector('.score-player');
+    const computerScore = document.querySelector('.score-computer');
+    const result = document.querySelector('h3');
 
-    for (let i = 0; i < 5; i++) {
-        let roundResult = playRound(getPlayerChoice(), getComputerChoice());
+    let roundResult = playRound(choice, getComputerChoice(), images);
+    let winner;
 
-        if (roundResult == PLAYER_WIN) {
-            console.log("Player won the round!");
-            numPlayerWin++;
-        }
-        else if (roundResult == COMPUTER_WIN) {
-            console.log("Computer has won the round :(");
-            numCompWin++;
-        } else console.log("There is a tie!");
-
-        if (numPlayerWin == 3 || numCompWin == 3) {
-            break;
-        }
+    if (roundResult == PLAYER_WIN) {
+        winner = "Player";
+        result.textContent = 'Player won the round!';
+        playerScore.textContent = `Player: ${++numPlayerWin}`;
+        computerScore.textContent = `Computer: ${numCompWin}`;
+    } else if (roundResult == COMPUTER_WIN) {
+        winner = "Computer";
+        result.textContent = 'Computer has won the round :(';
+        playerScore.textContent = `Player: ${numPlayerWin}`;
+        computerScore.textContent = `Computer: ${++numCompWin}`;
+    } else {
+        playerScore.textContent = `Player: ${numPlayerWin}`;
+        computerScore.textContent = `Computer: ${numCompWin}`;
+        result.textContent = 'There is a tie!';
     }
 
-    if (numPlayerWin > numCompWin) {
-        console.log("Player has won the game!");
-    } else {
-        console.log("Player has lost the game :(");
+    if (numCompWin == 5 || numPlayerWin == 5) {
+        result.textContent = `${winner} has won the game!
+                                Press any choices to start a new game.`;
+        numCompWin = 0;
+        numPlayerWin = 0;
     }
 }
 
@@ -88,4 +77,15 @@ const PLAYER_WIN = 0;
 const COMPUTER_WIN = 1;
 const TIE = 2;
 
-game();
+let numPlayerWin = 0;
+let numCompWin = 0;
+
+const rockButton = document.querySelector('.rock-button');
+const paperButton = document.querySelector('.paper-button');
+const scissorsButton = document.querySelector('.scissors-button');
+
+rockButton.addEventListener('click', () => gameHandler('rock'));
+paperButton.addEventListener('click', () => gameHandler('paper'));
+scissorsButton.addEventListener('click', () => gameHandler('scissors'));
+
+
